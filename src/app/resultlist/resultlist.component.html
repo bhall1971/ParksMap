@@ -1,0 +1,23 @@
+<div>
+  <input type="text" name="search"><input type="button" name="performsearch" value="Perform Search">
+</div>
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">User Id</th>
+        <th scope="col">Name</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <!-- use the observable by piping to async to realize the value -->
+      <tr *ngFor="let park of Parks$ | async">
+        <td>{{park.location}}</td>
+        <td>{{park.name}}</td>
+
+
+      </tr>
+    </tbody>
+  </table>
+</div>
