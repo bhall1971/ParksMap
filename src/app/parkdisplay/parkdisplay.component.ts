@@ -34,7 +34,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
               position: x.geometry.location,
               title: x.name
             })
-          ))
+          ));
       });
   }
 
@@ -65,7 +65,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private getLocation(address): Promise<google.maps.GeocoderResult> {
+  private getLocation(address): Promise<google.maps.LatLng> {
     return new Promise((resolve, reject) =>
       new google.maps.Geocoder().geocode(
         { address },
@@ -73,7 +73,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
           if (status !== google.maps.GeocoderStatus.OK) {
             reject();
           }
-          resolve(results[0]);
+          resolve(results[0].geometry.location);
         }
       )
     );
@@ -89,6 +89,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
             if (status !== google.maps.places.PlacesServiceStatus.OK) {
               reject();
             }
+            this.gmap.setCenter(LatLng);
             resolve(results);
           })
     );

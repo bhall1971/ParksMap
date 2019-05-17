@@ -1,10 +1,14 @@
-<h3>Angular Google API</h3>
+<div class="input-group mb-3" style="width: 25%">
+  <input #input type="text" class="form-control" placeholder="Enter Address" aria-label="Enter Address" aria-describedby="basic-addon2">
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" (click)="onClick(input.value)">Search</button>
+  </div>
+</div>
+<!--input #input />-->
+
 <div id='map' style='height: 800px; width: 80%'></div>
 
-<input #input />
-<button (click)="onClick(input.value)">Search</button>
-
-<ul class="list-group" style="top: 8px; right: 16px; position:absolute; overflow: auto">
+<ul class="list-group" style="top: 0px; right: 16px; position:absolute; overflow: auto">
   <li class="list-group-item" *ngFor="let r of parkList">{{r.name}}</li>
 </ul>
 
