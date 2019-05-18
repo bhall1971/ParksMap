@@ -11,8 +11,6 @@ import { Observable } from 'rxjs';
 })
 
 export class ParkdisplayComponent implements OnInit, AfterViewInit {
-  public lat: number;
-  public lng: number;
   public parkList: google.maps.places.PlaceResult[];
   public markers: google.maps.Marker[] = [];
   private gmap: google.maps.Map;
@@ -49,7 +47,6 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
 
     this.getLocation(location)
       .then(result => {
-
         this.getParkMap(this.gmap, result)
           .then(results => {
             this.parkList = results;
@@ -80,7 +77,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
   }
 
   private getParkMap(gmap, LatLng): Promise<google.maps.places.PlaceResult[]> {
-    // promisefy 
+    // promisefy
     return new Promise((resolve, reject) =>
       new google.maps.places.PlacesService(gmap)
         .nearbySearch(

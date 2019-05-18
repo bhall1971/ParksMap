@@ -1,17 +1,20 @@
-<div class="input-group mb-3" style="width: 25%">
-  <input #input type="text" class="form-control" placeholder="Enter Address" aria-label="Enter Address" aria-describedby="basic-addon2">
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary" (click)="onClick(input.value)">Search</button>
+<div class="row">
+    <div class="col-md-12">
+  <div class="input-group mb-3" style="width: 25%; padding-left: 1%">
+    <input #input type="text" class="form-control" placeholder="Enter Address" aria-label="Enter Address"
+      aria-describedby="basic-addon2">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" (click)="onClick(input.value)">Search</button>
+    </div>
+  </div>
   </div>
 </div>
 <!--input #input />-->
-
-<div id='map' style='height: 800px; width: 80%'></div>
-
-<ul class="list-group" style="top: 0px; right: 16px; position:absolute; overflow: auto">
-  <li class="list-group-item" *ngFor="let r of parkList">{{r.name}}</li>
-</ul>
-
-<p>
-  parkdisplay works!
-</p>
+<div class="row">
+  <div id='map' class="col-md-10" style="height:800px"></div>
+  <div class="col-md-2">
+    <ul class="list-group" style="top: 0px; right: 16px; position:absolute; overflow: auto">
+      <li class="list-group-item" *ngFor="let r of parkList">{{r.name}}</li>
+    </ul>
+  </div>
+</div>
