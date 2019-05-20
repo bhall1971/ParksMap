@@ -4,6 +4,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Inpu
 import { } from 'googlemaps';
 import { Observable } from 'rxjs';
 import { reject } from 'q';
+import { ProxyService } from '../proxyservice.service';
 
 @Component({
   selector: 'app-parkdisplay',
@@ -18,22 +19,17 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
   public errors: string;
 
   ngOnInit() {
-    // Initialize the map
+    // Center on Norfolk. TODO: Get current user location
     const norfolk = new google.maps.LatLng(36.9308009, -76.3097602);
+    // Initialize the map
     this.gmap = new google.maps.Map(
       document.getElementById('map'), { center: norfolk, zoom: 15 });
 
-    this.getParkMap(this.gmap, norfolk)
+     // Get the map using the Norfolk coordinates. TODO: Add error handling 
+    this.proxyService.getParkMap(this.gmap, norfolk)
       .then(results => {
-        this.parkList = results;
-        results.forEach(x =>
-          this.markers.push(
-            new google.maps.Marker({
-              map: this.gmap,
-              position: x.geometry.location,
-              title: x.name
-            })
-          ));
+        // Add to the array for binding
+        this.addPushPins(results);
       });
     // match the height of the list to the height of the map
     document.getElementById('list').style.height = document.getElementById('map').style.height;
@@ -42,62 +38,34 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
-  constructor() { }
+  constructor(private proxyService: ProxyService) { }
 
+  // Event handler for the button onlick. TODO: Handle the enter key being pressed
   public onClick(location) {
+    // Validate the input
     if (this.checkForErrors(location)) {
       return;
     }
+    // Clear the markers
     this.markers.forEach(x => x.setMap(null));
 
-    this.getLocation(location)
+    // Geocode to get the LatLong of the location requested
+    this.proxyService.getLocation(location)
       .then(result => {
-        this.getParkMap(this.gmap, result)
+        // Get the map using the LatLong from geocoding
+        this.proxyService.getParkMap(this.gmap, result)
           .then(results => {
-            this.parkList = results;
-            results.forEach(x =>
-              new google.maps.Marker({
-                map: this.gmap,
-                position: x.geometry.location,
-                title: x.name
-              })
-            )
+            // Re-center the map
+            this.gmap.setCenter(result);
+            this.addPushPins(results);
           });
 
-      });
+      })
+      // No location found. Show it on the screen.
+      .catch(error => this.errors = 'No Location Found');
   }
 
-  private getLocation(address): Promise<google.maps.LatLng> {
-    return new Promise((resolve, reject) =>
-      new google.maps.Geocoder().geocode(
-        { address },
-        (results, status) => {
-          if (status !== google.maps.GeocoderStatus.OK) {
-            this.errors = 'No location found.';
-            reject();
-          }
-          resolve(results[0].geometry.location);
-        }
-      )
-    );
-  }
-
-  private getParkMap(gmap, LatLng): Promise<google.maps.places.PlaceResult[]> {
-    // promisefy
-    return new Promise((resolve, reject) =>
-      new google.maps.places.PlacesService(gmap)
-        .nearbySearch(
-          { location: LatLng, radius: 5000, type: 'park' },
-          (results, status, pagination) => {
-            if (status !== google.maps.places.PlacesServiceStatus.OK) {
-              reject();
-            }
-            this.gmap.setCenter(LatLng);
-            resolve(results);
-          })
-    );
-  }
-
+  // Used to validate the input
   private checkForErrors(input): boolean {
     // clear errors
     this.errors = '';
@@ -107,5 +75,18 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
       this.errors = 'Please enter a valid location';
       return true;
     }
+  }
+  // Used to add markers to the map
+  private addPushPins(results){
+    // Add to the array for binding
+    this.parkList = results;
+    results.forEach(x =>
+      this.markers.push(
+        new google.maps.Marker({
+          map: this.gmap,
+          position: x.geometry.location,
+          title: x.name
+        })
+      ));
   }
 }
