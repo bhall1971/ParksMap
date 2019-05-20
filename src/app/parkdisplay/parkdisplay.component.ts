@@ -3,6 +3,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input } from '@angular/core';
 import { } from 'googlemaps';
 import { Observable } from 'rxjs';
+import { reject } from 'q';
 
 @Component({
   selector: 'app-parkdisplay',
@@ -14,11 +15,11 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
   public parkList: google.maps.places.PlaceResult[];
   public markers: google.maps.Marker[] = [];
   private gmap: google.maps.Map;
+  public errors: string;
 
   ngOnInit() {
     // Initialize the map
     const norfolk = new google.maps.LatLng(36.9308009, -76.3097602);
-
     this.gmap = new google.maps.Map(
       document.getElementById('map'), { center: norfolk, zoom: 15 });
 
@@ -34,6 +35,8 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
             })
           ));
       });
+    // match the height of the list to the height of the map
+    document.getElementById('list').style.height = document.getElementById('map').style.height;
   }
 
   ngAfterViewInit() {
@@ -42,7 +45,9 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
   constructor() { }
 
   public onClick(location) {
-    // clear markers
+    if (this.checkForErrors(location)) {
+      return;
+    }
     this.markers.forEach(x => x.setMap(null));
 
     this.getLocation(location)
@@ -68,6 +73,7 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
         { address },
         (results, status) => {
           if (status !== google.maps.GeocoderStatus.OK) {
+            this.errors = 'No location found.';
             reject();
           }
           resolve(results[0].geometry.location);
@@ -90,5 +96,16 @@ export class ParkdisplayComponent implements OnInit, AfterViewInit {
             resolve(results);
           })
     );
+  }
+
+  private checkForErrors(input): boolean {
+    // clear errors
+    this.errors = '';
+    // check for minimum length
+
+    if (input.length < 2) {
+      this.errors = 'Please enter a valid location';
+      return true;
+    }
   }
 }
